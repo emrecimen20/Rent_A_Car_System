@@ -18,6 +18,7 @@ public class Helper {
     }
 
     public static void showMssg(String str) {
+        optionPaneTR();
         String msg;
         String title;
 
@@ -34,6 +35,10 @@ public class Helper {
                 msg = "Kayıt Bulunamadı";
                 title = "Bulunamadı";
             }
+            case "error"->{
+                msg = "Hatalı İşlem";
+                title = "HATA";
+            }
             default -> {
                 msg = str;
                 title = "Mesaj";
@@ -43,6 +48,16 @@ public class Helper {
                 msg,
                 title,
                 JOptionPane.INFORMATION_MESSAGE);
+    }
+    public static boolean confirm(String str){
+        optionPaneTR();
+        String msg;
+        if(str.equals("sure")){
+            msg = "Bu işlemi yapmak istediğine emin misin ?";
+        }else{
+            msg=str;
+        }
+        return JOptionPane.showConfirmDialog(null,msg,"Emin misin ?",JOptionPane.YES_NO_OPTION)==0;
     }
 
     public static boolean isFieldEmpty(JTextField field) {
@@ -64,5 +79,10 @@ public class Helper {
             case "y" -> (Toolkit.getDefaultToolkit().getScreenSize().height - size.height) / 2;
             default -> 0;
         };
+    }
+    public static void optionPaneTR(){
+        UIManager.put("OptionPane.okButtonText", "Tamam");
+        UIManager.put("OptionPane.yesButtonText", "Evet");
+        UIManager.put("OptionPane.noButtonText", "Hayır");
     }
 }
