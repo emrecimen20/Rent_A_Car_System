@@ -20,7 +20,7 @@ public class CarDao {
         this.modelDao = new ModelDao();
     }
     public Car getById(int id){
-        Car obj =null;
+        Car obj = null ;
         String query = "SELECT * FROM public.car WHERE car_id = ?";
         try {
             PreparedStatement pr =con.prepareStatement(query);

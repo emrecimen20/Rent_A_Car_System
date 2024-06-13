@@ -73,7 +73,7 @@ public class CarManager {
     }
 
     public ArrayList<Car> searchForBooking(String strt_date, String fnsh_date, Model.Type type, Model.Gear gear, Model.Fuel fuel) {
-        String query = "SELECT * FROM public.car as c LEFT JOIN public.model as m ";
+        String query = "SELECT * FROM public.car as c LEFT JOIN public.model as m";
 
         ArrayList<String> where = new ArrayList<>();
         ArrayList<String> joinWhere = new ArrayList<>();

@@ -59,6 +59,7 @@ public class AdminView extends Layout {
     private JLabel lbl_book_fuel;
     private JLabel lbl_book_type;
     private JButton btn_booing_cancel;
+    private JPanel pnl_book;
     private User user;
     private DefaultTableModel tmdl_brand = new DefaultTableModel();
     private DefaultTableModel tmdl_model = new DefaultTableModel();
@@ -123,10 +124,10 @@ public class AdminView extends Layout {
         this.booking_menu = new JPopupMenu();
         tableRowSelect(this.tbl_book, booking_menu);
 
-        this.car_menu.add("Yeni").addActionListener(e -> {
+        this.booking_menu.add("Rezervasyon Yap").addActionListener(e -> {
 
         });
-
+        this.tbl_book.setComponentPopupMenu(booking_menu);
     }
 
     private void loadBookingTable(ArrayList<Object[]> carList) {
@@ -323,10 +324,9 @@ public class AdminView extends Layout {
     }
 
     private void createUIComponents() throws ParseException {
-        this.fld_strt_date = new JFormattedTextField(new MaskFormatter("##/##/####"));
+        this.fld_strt_date =new JFormattedTextField(new MaskFormatter("##/##/####"));
         this.fld_strt_date.setText("10/10/2023");
-
-        this.fld_fnsh_date = new JFormattedTextField(new MaskFormatter("##/##/####"));
-        this.fld_fnsh_date.setText("12/10/2023");
+        this.fld_fnsh_date =new JFormattedTextField(new MaskFormatter("##/##/####"));
+        this.fld_fnsh_date.setText("16/10/2023");
     }
 }
