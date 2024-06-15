@@ -1,14 +1,12 @@
 package view;
 
+import business.BookManager;
 import business.BrandManager;
 import business.CarManager;
 import business.ModelManager;
 import core.ComboItem;
 import core.Helper;
-import entity.Brand;
-import entity.Car;
-import entity.Model;
-import entity.User;
+import entity.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -60,7 +58,14 @@ public class AdminView extends Layout {
     private JLabel lbl_book_type;
     private JButton btn_booing_cancel;
     private JPanel pnl_book;
+    private JPanel pnl_rented;
+    private JTable tbl_rented;
+    private JScrollPane scrl_rented;
+    private JComboBox cmb_rented_plate;
+    private JButton btn_search_rented;
+    private JButton btn_cancel_rented;
     private User user;
+    private DefaultTableModel tmdl_rented = new DefaultTableModel();
     private DefaultTableModel tmdl_brand = new DefaultTableModel();
     private DefaultTableModel tmdl_model = new DefaultTableModel();
     private DefaultTableModel tmdl_car = new DefaultTableModel();
@@ -70,15 +75,19 @@ public class AdminView extends Layout {
     private JPopupMenu brand_menu;
     private JPopupMenu model_menu;
     private JPopupMenu car_menu;
+    private JPopupMenu rented_menu;
     private Object[] col_model;
     private CarManager carManager;
     private JPopupMenu booking_menu;
     private Object[] col_car;
+    private Object[] col_rented;
+    private BookManager bookManager;
 
     public AdminView(User user) {
         this.carManager = new CarManager();
         this.modelManager = new ModelManager();
         this.brandManager = new BrandManager();
+        this.bookManager =new BookManager();
         this.add(container);
         this.guiInitilaze(1000, 500);
         this.user = user;
@@ -88,6 +97,8 @@ public class AdminView extends Layout {
         }
 
         this.lbl_welcome.setText("Hoşgeldiniz " + this.user.getUsername());
+
+        SystemExit();
 
         loadBrandTable();
         loadBrandComponent();
@@ -104,6 +115,82 @@ public class AdminView extends Layout {
         loadBookingComponent();
         loadBookingFilter();
 
+
+        loadRentedTable(null);
+        loadRentedComponent();
+        loadRentedFilter();
+
+
+    }
+
+    public void loadRentedTable(ArrayList<Object[]> bookList){
+        col_rented = new Object[]{"ID","Plaka","Araç Marka","Araç Model","Müşteri","Telefon","Mail","TC NO","Başlangıç Tarihi","Bitiş Tarihi","Fiyat" };
+        if(bookList == null){
+            bookList=this.bookManager.getForTable(col_rented.length,this.bookManager.findAll());
+        }
+        createTable(this.tmdl_rented,this.tbl_rented,col_rented, bookList);
+    }
+    public void loadRentedComponent() {
+        this.rented_menu = new JPopupMenu();
+        this.rented_menu.add("İptal Et").addActionListener(e -> {
+            if (Helper.confirm("sure")) {
+                int selectBookId = this.getTableSelectedRow(this.tbl_rented, 0);
+
+                if (this.bookManager.delete(selectBookId)) {
+                    Helper.showMssg("done");
+                    loadRentedTable(null);
+                } else {
+                    Helper.showMssg("error");
+                }
+            }
+        });
+        this.rented_menu.setComponentPopupMenu(rented_menu);
+        tableRowSelect(this.tbl_rented,rented_menu);
+        btn_search_rented.addActionListener(e -> {
+        ComboItem selectedCar = (ComboItem) this.cmb_rented_plate.getSelectedItem();
+        int carId = 0;
+        if(selectedCar != null){
+            carId =selectedCar.getKey();
+        }
+            ArrayList<Book> bookListBySearch = this.bookManager.searchForTable(carId);
+            ArrayList<Object[]> bookRowListBySearch = this.bookManager.getForTable(this.col_rented.length, bookListBySearch);
+            loadRentedTable(bookRowListBySearch);
+        });
+        btn_cancel_rented.addActionListener(e -> {
+            loadRentedFilter();
+        });
+
+    }
+    public void loadRentedFilter() {
+        this.cmb_rented_plate.removeAllItems();
+        for (Car obj : this.carManager.findAll()) {
+            this.cmb_rented_plate.addItem(new ComboItem(obj.getId(), obj.getPlate()));
+        }
+        this.cmb_rented_plate.setSelectedItem(null);
+    }
+
+
+    public void loadBookingComponent() {
+        this.booking_menu = new JPopupMenu();
+        tableRowSelect(this.tbl_book, booking_menu);
+
+        this.booking_menu.add("Rezervasyon Yap").addActionListener(e -> {
+            int selectedCarId =this.getTableSelectedRow(this.tbl_book,0);
+            BookingView bookingView = new BookingView(
+                    this.carManager.getById(selectedCarId),
+                    this.fld_strt_date.getText(),
+                    this.fld_fnsh_date.getText()
+            );
+            bookingView.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    loadBookingTable(null);
+                    loadBookingFilter();
+                }
+            });
+        });
+        this.tbl_book.setComponentPopupMenu(booking_menu);
+
         btn_booking_search.addActionListener(e -> {
             ArrayList<Car> carList = this.carManager.searchForBooking(
                     fld_strt_date.getText(),
@@ -118,16 +205,6 @@ public class AdminView extends Layout {
         btn_booing_cancel.addActionListener(e -> {
             loadBookingFilter();
         });
-    }
-
-    public void loadBookingComponent() {
-        this.booking_menu = new JPopupMenu();
-        tableRowSelect(this.tbl_book, booking_menu);
-
-        this.booking_menu.add("Rezervasyon Yap").addActionListener(e -> {
-
-        });
-        this.tbl_book.setComponentPopupMenu(booking_menu);
     }
 
     private void loadBookingTable(ArrayList<Object[]> carList) {
@@ -328,5 +405,15 @@ public class AdminView extends Layout {
         this.fld_strt_date.setText("10/10/2023");
         this.fld_fnsh_date =new JFormattedTextField(new MaskFormatter("##/##/####"));
         this.fld_fnsh_date.setText("16/10/2023");
+    }
+
+    public void SystemExit(){
+        btn_logout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            dispose();
+            LoginView loginView = new LoginView();
+            }
+        });
     }
 }

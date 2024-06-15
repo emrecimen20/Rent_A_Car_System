@@ -111,7 +111,7 @@ public class CarManager {
         bookOrWhere.add("(book_strt_date BETWEEN '" + strt_date + "' AND '" + fnsh_date + "')");
         bookOrWhere.add("(book_fnsh_date BETWEEN '" + strt_date + "' AND '" + fnsh_date + "')");
 
-        String bookOrWhereStr = String.join(" AND ", bookOrWhere);
+        String bookOrWhereStr = String.join(" OR ", bookOrWhere);
         String bookQuery = "SELECT * FROM public.book WHERE " + bookOrWhereStr;
 
         ArrayList<Book> bookList = this.bookDao.selectByQuery(bookQuery);
